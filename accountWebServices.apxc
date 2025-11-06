@@ -1,0 +1,66 @@
+@RestResource(urlMapping = '/Account/AccountServices/*')
+global with sharing class accountWebService {
+	@HttpGet
+    global static Account getAccount(){
+        String accIds = RestContext.request.params.get('Id');
+        if(string.isBlank(accIds)){
+            RestContext.response.statusCode = 400;
+            return null;
+        }
+        try{
+            Account acc = [Select Id, Name, Rating, Industry, Phone From Account Where Id =: accIds];
+            return acc;
+        }
+        catch (Exception e) {
+            RestContext.response.statusCode = 400;
+            return null;
+        }
+    }
+    //HTTP POST Method
+    @HttpPost
+    global static Account createAccount(String accName, String accType, String accPhone, String accRating){
+        Account acc = new Account();
+        acc.Name = accName;
+        acc.Type = accType;
+        acc.Phone = accPhone;
+        acc.Rating  = accRating;
+        
+        insert acc;
+        return acc;
+    }
+    
+    //HTTP PATCH Method
+    @HttpPatch
+    global static Account patchAccount(String accIds, String accName, String accType, String accPhone, String accRating){
+        Account acc = [Select Id, Name, Type, Phone, Rating From Account Where Id=:accIds];
+        acc.Name = accName;
+        acc.Type = accType;
+        acc.Phone  = accPhone;
+        acc.Rating = accRating;
+        
+        update acc;
+        return acc;
+    }
+    
+    //HTTP PUT Method
+    @HttpPut
+    global static Account putAccount(String accIds, String accName, String accType, String accPhone, String accRating){
+        Account acc = [Select Id, Name, Type, Phone, Rating From Account Where Id =: accIds];
+        acc.Name = accName;
+        acc.Type = accType;
+        acc.Phone = accPhone;
+        acc.Rating = accRating;
+        
+        update acc;
+        return acc;
+    }
+    
+    //HTTP DELETE Method
+    @HttpDelete
+    global static String deleteAccount(){
+        String accIds = RestContext.request.params.get('Id');
+        Account acc = [Select Id From Account Where Id =: accIds];
+        delete acc;
+        return accIds;
+    }
+}
